@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskRequest;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -11,15 +13,17 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $tasks = Task::with('project:id,name')->get();
+        return response()->json($tasks);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
-        //
+        $task = Task::create($request->validated());
+        return response()->json($task);
     }
 
     /**
@@ -27,15 +31,18 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $task = Task::with('project:id,name')->findOrFail($id);
+        return response()->json($task);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(TaskRequest $request, string $id)
     {
-        //
+        $task = Task::findOrFail($id);
+        $task->update($request->validated());
+        return response()->json($task);
     }
 
     /**
@@ -43,6 +50,8 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $task = Task::findOrFail($id);
+        $task->delete();
+        return response()->json($task);
     }
 }
